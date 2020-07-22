@@ -17,7 +17,7 @@ import os
 import sys 
 import requests
 from flask import Flask, render_template, session, redirect, url_for, session
-import joblib
+import requests
 
 class My_Custom_Generator(Sequence) :
   
@@ -39,7 +39,7 @@ class My_Custom_Generator(Sequence) :
     
     imag = np.array([resize(img,(256, 256,3)) for img in images])/255.0
     return imag,label_list
-import requests
+
 #taken from this StackOverflow answer: https://stackoverflow.com/a/39225039
 
 def download_file_from_google_drive(id, destination):
@@ -88,7 +88,9 @@ run_with_ngrok(app)#loading the model weights
 model = load_model(destination)
 @app.route('/')
 def home():
-    return render_template('index.html')@app.route('/predict',methods=['POST'])
+    return render_template('index.html')
+    
+@app.route('/predict',methods=['POST'])
 def predict():
     '''
     For rendering results on HTML GUI
@@ -96,7 +98,7 @@ def predict():
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
-        vect = cv.transform(data).toarray()
+        generator = single_picture_loader(data)
         my_prediction = model.predict(vect)
         if my_prediction == 1:
             output = "a Spam"
