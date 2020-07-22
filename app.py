@@ -1,3 +1,24 @@
+#importing libraries
+import numpy as np
+from flask import Flask, request, jsonify, render_template
+from flask_ngrok import run_with_ngrok
+import pickle#creating the flask object
+from tensorflow.keras.models import load_model
+from tensorflow.keras.utils import get_file
+from tensorflow.keras.utils import Sequence
+import tensorflow as tf
+tf.get_logger().setLevel('ERROR')
+from skimage.io import imread
+from skimage.transform import resize
+from numpy import load,array,argmax
+import numpy as np
+import urllib.request
+import os
+import sys 
+import requests
+from flask import Flask, render_template, session, redirect, url_for, session
+import joblib
+
 class My_Custom_Generator(Sequence) :
   
   def __init__(self, image_filenames, labels, batch_size,augmented=False) :
@@ -9,25 +30,12 @@ class My_Custom_Generator(Sequence) :
   def __len__(self) :
     return (np.ceil(len(self.image_filenames) / float(self.batch_size))).astype(np.int)
 
-  def augmentor(self,images):
-    seq = iaa.Sequential([
-    iaa.Crop(px=(1, 16), keep_size=False),
-    iaa.GaussianBlur(sigma=(0, 3.0)),
-    iaa.Multiply((1.2, 1.5))
-    ])
-    return seq.augment_images(images)
-  
   def __getitem__(self, idx) :
     batch_x = self.image_filenames[idx * self.batch_size : (idx+1) * self.batch_size]
     batch_y = self.labels[idx * self.batch_size : (idx+1) * self.batch_size]
 
     images = [imread(file_name) for file_name in batch_x]
     label_list = np.array(batch_y)
-
-    if self.augmented:
-      aug_img = self.augmentor(images)
-      label_list = np.append(label_list, label_list)
-      images= aug_img + images
     
     imag = np.array([resize(img,(256, 256,3)) for img in images])/255.0
     return imag,label_list
@@ -73,11 +81,7 @@ def single_picture_loader(img_path):
 file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
 destination = 'model.h5'
 download_file_from_google_drive(file_id, destination)
-#importing libraries
-import numpy as np
-from flask import Flask, request, jsonify, render_template
-from flask_ngrok import run_with_ngrok
-import pickle#creating the flask object
+
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
