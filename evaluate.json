@@ -1,0 +1,15 @@
+{
+    "drive":{
+        "weights_only":true,
+        "weights_id":"1-CAK0sRHULQHPpon99goGViH71fs7D-h",
+        "weights_destination":"model_weights.pkl",
+        "model_id":"",
+        "model_destination":""
+    },
+    "local":{
+        "weights_only":true,
+        "weights_location":"",
+        "model_location":""
+    }
+
+}
