@@ -4,20 +4,26 @@ from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
 import pickle#creating the flask object
 from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import get_file
 from tensorflow.keras.utils import Sequence
-import tensorflow as tf
-tf.get_logger().setLevel('ERROR')
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import load,array,argmax
 import numpy as np
 import urllib.request
 import os
-import sys 
 import requests
 from flask import Flask, render_template, session, redirect, url_for, session
 import requests
+import base64
+
+
+def decode(base64_string):
+    if isinstance(base64_string, bytes):
+        base64_string = base64_string.decode("utf-8")
+
+    imgdata = base64.b64decode(base64_string)
+    img = imread(imgdata, plugin='imageio')
+    return img
 
 class My_Custom_Generator(Sequence) :
   
@@ -34,7 +40,7 @@ class My_Custom_Generator(Sequence) :
     batch_x = self.image_filenames[idx * self.batch_size : (idx+1) * self.batch_size]
     batch_y = self.labels[idx * self.batch_size : (idx+1) * self.batch_size]
 
-    images = [imread(file_name) for file_name in batch_x]
+    images = [decode(file_name) for file_name in batch_x]
     label_list = np.array(batch_y)
     
     imag = np.array([resize(img,(256, 256,3)) for img in images])/255.0
