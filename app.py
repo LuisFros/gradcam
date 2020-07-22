@@ -1,3 +1,74 @@
+class My_Custom_Generator(Sequence) :
+  
+  def __init__(self, image_filenames, labels, batch_size,augmented=False) :
+    self.image_filenames = image_filenames
+    self.labels = labels
+    self.batch_size = batch_size
+    self.augmented = augmented
+    
+  def __len__(self) :
+    return (np.ceil(len(self.image_filenames) / float(self.batch_size))).astype(np.int)
+
+  def augmentor(self,images):
+    seq = iaa.Sequential([
+    iaa.Crop(px=(1, 16), keep_size=False),
+    iaa.GaussianBlur(sigma=(0, 3.0)),
+    iaa.Multiply((1.2, 1.5))
+    ])
+    return seq.augment_images(images)
+  
+  def __getitem__(self, idx) :
+    batch_x = self.image_filenames[idx * self.batch_size : (idx+1) * self.batch_size]
+    batch_y = self.labels[idx * self.batch_size : (idx+1) * self.batch_size]
+
+    images = [imread(file_name) for file_name in batch_x]
+    label_list = np.array(batch_y)
+
+    if self.augmented:
+      aug_img = self.augmentor(images)
+      label_list = np.append(label_list, label_list)
+      images= aug_img + images
+    
+    imag = np.array([resize(img,(256, 256,3)) for img in images])/255.0
+    return imag,label_list
+import requests
+#taken from this StackOverflow answer: https://stackoverflow.com/a/39225039
+
+def download_file_from_google_drive(id, destination):
+    URL = "https://docs.google.com/uc?export=download"
+
+    session = requests.Session()
+
+    response = session.get(URL, params = { 'id' : id }, stream = True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = { 'id' : id, 'confirm' : token }
+        response = session.get(URL, params = params, stream = True)
+
+    save_response_content(response, destination)    
+
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+
+    return None
+
+def save_response_content(response, destination):
+    CHUNK_SIZE = 32768
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk: # filter out keep-alive new chunks
+                f.write(chunk)
+
+def single_picture_loader(img_path):
+  BATCH_SIZE = 1
+  UNUSED_LABEL = [1]
+  IMAGES = [img_path]
+  return My_Custom_Generator(IMAGES, UNUSED_LABEL,BATCH_SIZE)
+
 
 file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
 destination = 'model.h5'
