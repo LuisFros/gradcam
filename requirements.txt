@@ -3,4 +3,4 @@ gunicorn==19.9.0
 numpy>=1.9.2
 matplotlib>=1.4.3
 Pandas>=0.19
-tensorflow==2.2.0
+tensorflow-cpu==2.2.0
