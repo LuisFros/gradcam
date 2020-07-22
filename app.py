@@ -84,14 +84,14 @@ def single_picture_loader(img_path):
   return My_Custom_Generator(IMAGES, UNUSED_LABEL,BATCH_SIZE)
 
 
-file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
-destination = 'model.h5'
-download_file_from_google_drive(file_id, destination)
+# file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
+# destination = 'model.h5'
+# download_file_from_google_drive(file_id, destination)
 
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
-model = load_model(destination)
+# model = load_model(destination)
 @app.route('/')
 def home():
     return render_template('index.html')
