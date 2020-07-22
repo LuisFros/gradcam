@@ -86,7 +86,10 @@ def single_picture_loader(img_path):
 
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
-
+file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
+destination = 'model.h5'
+download_file_from_google_drive(file_id, destination)
+model = load_model(destination)
 # model = load_model(destination)
 @app.route('/')
 def home():
@@ -100,10 +103,6 @@ def predict():
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
-        file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
-        destination = 'model.h5'
-        download_file_from_google_drive(file_id, destination)
-        model = load_model(destination)
         generator = single_picture_loader(data)
         my_prediction = model.predict(generator)
         if my_prediction == 1:
@@ -114,4 +113,5 @@ def predict():
     outputs = 'This email is '+output
     return render_template('index2.html', prediction_text=outputs , value=message)
 if __name__ == "__main__":
+    
     app.run()
