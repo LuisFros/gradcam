@@ -85,8 +85,9 @@ def single_picture_loader(img_path):
 
 
 app = Flask(__name__)
+
 run_with_ngrok(app)#loading the model weights
-file_id = '1fVmpa2omDEjlm5PZkxHBhYmgnMpkHglq'
+file_id = '1KNJIY17ZkdZOAO7vnxAbgaBseqUGcVkH'
 destination = 'model.h5'
 download_file_from_google_drive(file_id, destination)
 model = load_model(destination)
@@ -104,6 +105,7 @@ def predict():
         message = request.form['message']
         data = [message]
         generator = single_picture_loader(data)
+        print(model.summary())
         # my_prediction = model.predict(generator)
         # if my_prediction == 1:
         #     output = "a Spam"
