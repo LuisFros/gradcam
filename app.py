@@ -104,14 +104,14 @@ def predict():
         message = request.form['message']
         data = [message]
         generator = single_picture_loader(data)
-        my_prediction = model.predict(generator)
-        if my_prediction == 1:
-            output = "a Spam"
-        elif my_prediction == 0:
-            output = "Not a Spam"
+        # my_prediction = model.predict(generator)
+        # if my_prediction == 1:
+        #     output = "a Spam"
+        # elif my_prediction == 0:
+        #     output = "Not a Spam"
     
     outputs = 'This email is '+output
-    return render_template('index2.html', prediction_text=outputs , value=message)
+    return render_template('index2.html', generator_data=generator , value=message)
 if __name__ == "__main__":
     
     app.run()
