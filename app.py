@@ -88,15 +88,15 @@ def single_picture_loader(img_path):
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 file_id = '12FFDJrXrrvpxArx1qE1fwdomOZ9Zd5ef'
-destination = 'model_weights.pkt'
-download_file_from_google_drive(file_id, destination)
+destination_w = 'model_weights.pkl'
+download_file_from_google_drive(file_id, destinationw)
 
 model_function = '1-8CBiDAPE4pdPJtvRLi77PtrC4zNthJa'
-destination = 'model_function.pkt'
-download_file_from_google_drive(model_function, destination)
+destination_f = 'model_function.pkl'
+download_file_from_google_drive(model_function, destination_f)
 
-loaded_weights = pickle.load(open('model_weights.pkl','rb'))
-model_function = pickle.load(open('model_function.pkl','rb'))
+loaded_weights = pickle.load(open(destination_w,'rb'))
+model_function = pickle.load(open(destination_f,'rb'))
 model = model_function()
 model.set_weights(loaded_weights)
 # model = load_model(destination)
