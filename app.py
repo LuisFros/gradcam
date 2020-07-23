@@ -89,7 +89,7 @@ app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 file_id = '12FFDJrXrrvpxArx1qE1fwdomOZ9Zd5ef'
 destination_w = 'model_weights.pkl'
-download_file_from_google_drive(file_id, destinationw)
+download_file_from_google_drive(file_id, destination_w)
 
 model_function = '1-8CBiDAPE4pdPJtvRLi77PtrC4zNthJa'
 destination_f = 'model_function.pkl'
