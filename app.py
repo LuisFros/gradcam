@@ -3,6 +3,7 @@ import numpy as np
 from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
 import pickle#creating the flask object
+import pickle
 from tensorflow.keras.models import load_model
 from tensorflow.keras.utils import Sequence
 from skimage.io import imread
@@ -85,12 +86,19 @@ def single_picture_loader(img_path):
 
 
 app = Flask(__name__)
-
 run_with_ngrok(app)#loading the model weights
-file_id = '1KNJIY17ZkdZOAO7vnxAbgaBseqUGcVkH'
-destination = 'model.h5'
+file_id = '12FFDJrXrrvpxArx1qE1fwdomOZ9Zd5ef'
+destination = 'model_weights.pkt'
 download_file_from_google_drive(file_id, destination)
-model = load_model(destination)
+
+model_function = '1-8CBiDAPE4pdPJtvRLi77PtrC4zNthJa'
+destination = 'model_function.pkt'
+download_file_from_google_drive(model_function, destination)
+
+loaded_weights = pickle.load(open('model_weights.pkl','rb'))
+model_function = pickle.load(open('model_function.pkl','rb'))
+model = model_function()
+model.set_weights(loaded_weights)
 # model = load_model(destination)
 @app.route('/')
 def home():
