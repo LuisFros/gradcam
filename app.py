@@ -61,7 +61,9 @@ def download_file_from_google_drive(id, destination):
         params = { 'id' : id, 'confirm' : token }
         response = session.get(URL, params = params, stream = True)
 
-    save_response_content(response, destination)    
+    return save_to_pickle(response)
+
+
 
 def get_confirm_token(response):
     for key, value in response.cookies.items():
@@ -72,11 +74,14 @@ def get_confirm_token(response):
 
 def save_response_content(response, destination):
     CHUNK_SIZE = 32768
-
     with open(destination, "wb") as f:
         for chunk in response.iter_content(CHUNK_SIZE):
             if chunk: # filter out keep-alive new chunks
                 f.write(chunk)
+
+
+def save_to_pickle(response):
+    return pickle.loads(response.content)
 
 def single_picture_loader(img_path):
   BATCH_SIZE = 1
@@ -89,14 +94,12 @@ app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 file_id = '12FFDJrXrrvpxArx1qE1fwdomOZ9Zd5ef'
 destination_w = 'model_weights.pkl'
-download_file_from_google_drive(file_id, destination_w)
+loaded_weights = download_file_from_google_drive(file_id, destination_w)
 
 model_function = '1-8CBiDAPE4pdPJtvRLi77PtrC4zNthJa'
 destination_f = 'model_function.pkl'
-download_file_from_google_drive(model_function, destination_f)
+model_function = download_file_from_google_drive(model_function, destination_f)
 
-loaded_weights = pickle.load(open(destination_w,'rb'))
-model_function = pickle.load(open(destination_f,'rb'))
 model = model_function()
 model.set_weights(loaded_weights)
 # model = load_model(destination)
