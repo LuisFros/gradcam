@@ -2,10 +2,7 @@
 import numpy as np
 from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
-import pickle#creating the flask object
 import pickle
-from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import Sequence
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import load,array,argmax
