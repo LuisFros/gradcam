@@ -16,7 +16,6 @@ from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.layers import Input, Dense, Flatten, AveragePooling2D, Dropout, BatchNormalization, Conv2D, concatenate
 import tensorflow
-import cv2
 import sys
 
 INP_SIZE = (224,224,3)
@@ -92,8 +91,7 @@ def predict():
         # generator = single_picture_loader(data)
         print(model.summary())
         image = decode(data)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(image, (224, 224))
+        image = resize(image, (224, 224,3))
         image = [image]
         image = np.array(image)/255.0
         image = [image for _ in range(3)]
