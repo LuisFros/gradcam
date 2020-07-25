@@ -73,7 +73,7 @@ app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
 model = generate_model()
-model.load_weights('./15209814/modelo1_weights.h5')
+model.load_weights('modelo1_weights.h5')
 
 
 
