@@ -23,3 +23,5 @@ class IrisClassifier:
         prediction = self.clf.predict_proba([X])
         return {'class': self.iris_type[np.argmax(prediction)],
                 'probability': round(max(prediction[0]), 2)}
+
+

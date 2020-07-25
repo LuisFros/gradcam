@@ -8,3 +8,9 @@ app.include_router(iris_classifier_router.router, prefix='/iris')
 @app.get('/healthcheck', status_code=200)
 async def healthcheck():
     return 'Iris classifier is all ready to go!'
+
+
+
+@app.get('/', status_code=200)
+async def index():
+    return 'Iris classifier is all ready to go!'
