@@ -6,6 +6,7 @@ import pickle
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import load,array,argmax
+import tensorflow
 import urllib.request
 import os
 import requests
