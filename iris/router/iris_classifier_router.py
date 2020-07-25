@@ -3,7 +3,7 @@ from starlette.responses import JSONResponse
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import array,argmax,uint8
-from tensorflow.keras.models import model_from_json
+from iris.model_loader import get_model
 import base64
 
 router = APIRouter()
@@ -17,11 +17,7 @@ def decode(base64_string):
 
 @router.post('/classify_iris')
 def extract_name(file_data: str = Body(...)):
-
-    with open("../../data/model_num.json", "r") as json_file:
-        model = model_from_json(json_file.read())
-    
-    model.load_weights('../../data/modelo1_weights.h5')
+    model = get_model()
     image = decode(file_data)
     image = resize(image, (224, 224,3))
     image = [image]
