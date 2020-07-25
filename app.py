@@ -12,47 +12,7 @@ import requests
 from flask import Flask, render_template, session, redirect, url_for, session
 import requests
 import base64
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.applications import DenseNet121
-from tensorflow.keras.layers import Input, Dense, Flatten, AveragePooling2D, Dropout, BatchNormalization, Conv2D, concatenate
-import tensorflow
 import sys
-
-INP_SIZE = (224,224,3)
-def generate_DenseNet_model():
-    model = DenseNet121(
-        include_top = False,
-        weights = 'imagenet',
-        input_tensor = Input(shape=INP_SIZE),
-    )
-    return model
-
-def define_stacked_model(members):
-	for i in range(len(members)):
-		model = members[i]
-		for layer in model.layers:
-			layer.trainable = False
-			layer._name = 'ensemble_' + str(i+1) + '_' + layer.name
-	ensemble_visible = [model.input for model in members]
-	ensemble_outputs = [model.output for model in members]
-	merge = concatenate(ensemble_outputs)
-	headModel = AveragePooling2D(pool_size=(4, 4))(merge)
-	headModel = Flatten(name="flatten")(headModel)
-	headModel = Dense(100, activation="relu")(headModel)
-	headModel = Dropout(0.5)(headModel)
-	output = Dense(3, activation="softmax")(headModel)
-	model = Model(inputs=ensemble_visible, outputs=output)
-	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-	return model
-
-
-def generate_model():
-    model = generate_DenseNet_model()
-    model2 = tensorflow.keras.models.clone_model(model)
-    model3 = tensorflow.keras.models.clone_model(model)
-    members = [model, model2, model3]
-    model = define_stacked_model(members)
-    return model
 
 
 
@@ -70,9 +30,13 @@ def decode(base64_string):
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
-model = generate_model()
-model.load_weights('modelo1_weights.h5')
+with open('model.pkl','rb') as file:
+  model_from_json_pickle = pickle.load(file)
 
+with open("model_num.json", "r") as json_file:
+    model = model_from_json_pickle(json_file.read())
+
+model.load_weights('modelo1_weights.h5')
 
 
 # model = load_model(destination)
