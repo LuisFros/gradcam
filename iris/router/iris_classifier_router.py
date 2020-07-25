@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,Body
 from starlette.responses import JSONResponse
 from skimage.io import imread
 from skimage.transform import resize
@@ -16,12 +16,12 @@ def decode(base64_string):
     return img
 
 @router.post('/classify_iris')
-def extract_name(file_data):
+def extract_name(file_data: str = Body(...)):
 
-    with open("model_num.json", "r") as json_file:
+    with open("/data/model_num.json", "r") as json_file:
         model = model_from_json(json_file.read())
     
-    model.load_weights('modelo1_weights.h5')
+    model.load_weights('/data/modelo1_weights.h5')
     image = decode(file_data)
     image = resize(image, (224, 224,3))
     image = [image]
