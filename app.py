@@ -3,17 +3,58 @@ import numpy as np
 from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
 import pickle
-from tensorflow.keras.utils import Sequence
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import load,array,argmax
-import numpy as np
 import urllib.request
 import os
 import requests
 from flask import Flask, render_template, session, redirect, url_for, session
 import requests
 import base64
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras.layers import Input, Dense, Flatten, AveragePooling2D, Dropout, BatchNormalization, Conv2D, concatenate
+import tensorflow
+import cv2
+import sys
+
+INP_SIZE = (224,224,3)
+def generate_DenseNet_model():
+    model = DenseNet121(
+        include_top = False,
+        weights = 'imagenet',
+        input_tensor = Input(shape=INP_SIZE),
+    )
+    return model
+
+def define_stacked_model(members):
+	for i in range(len(members)):
+		model = members[i]
+		for layer in model.layers:
+			layer.trainable = False
+			layer._name = 'ensemble_' + str(i+1) + '_' + layer.name
+	ensemble_visible = [model.input for model in members]
+	ensemble_outputs = [model.output for model in members]
+	merge = concatenate(ensemble_outputs)
+	headModel = AveragePooling2D(pool_size=(4, 4))(merge)
+	headModel = Flatten(name="flatten")(headModel)
+	headModel = Dense(100, activation="relu")(headModel)
+	headModel = Dropout(0.5)(headModel)
+	output = Dense(3, activation="softmax")(headModel)
+	model = Model(inputs=ensemble_visible, outputs=output)
+	model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+	return model
+
+
+def generate_model():
+    model = generate_DenseNet_model()
+    model2 = tensorflow.keras.models.clone_model(model)
+    model3 = tensorflow.keras.models.clone_model(model)
+    members = [model, model2, model3]
+    model = define_stacked_model(members)
+    return model
+
 
 
 def decode(base64_string):
@@ -24,82 +65,18 @@ def decode(base64_string):
     img = imread(imgdata, plugin='imageio')
     return img
 
-class My_Custom_Generator(Sequence) :
-  
-  def __init__(self, image_filenames, labels, batch_size,augmented=False) :
-    self.image_filenames = image_filenames
-    self.labels = labels
-    self.batch_size = batch_size
-    self.augmented = augmented
-    
-  def __len__(self) :
-    return (np.ceil(len(self.image_filenames) / float(self.batch_size))).astype(np.int)
-
-  def __getitem__(self, idx) :
-    batch_x = self.image_filenames[idx * self.batch_size : (idx+1) * self.batch_size]
-    batch_y = self.labels[idx * self.batch_size : (idx+1) * self.batch_size]
-
-    images = [decode(file_name) for file_name in batch_x]
-    label_list = np.array(batch_y)
-    
-    imag = np.array([resize(img,(256, 256,3)) for img in images])/255.0
-    return imag,label_list
-
 #taken from this StackOverflow answer: https://stackoverflow.com/a/39225039
 
-def download_file_from_google_drive(id, destination):
-    URL = "https://docs.google.com/uc?export=download"
-
-    session = requests.Session()
-
-    response = session.get(URL, params = { 'id' : id }, stream = True)
-    token = get_confirm_token(response)
-
-    if token:
-        params = { 'id' : id, 'confirm' : token }
-        response = session.get(URL, params = params, stream = True)
-
-    return save_to_pickle(response)
-
-
-
-def get_confirm_token(response):
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            return value
-
-    return None
-
-def save_response_content(response, destination):
-    CHUNK_SIZE = 32768
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(CHUNK_SIZE):
-            if chunk: # filter out keep-alive new chunks
-                f.write(chunk)
-
-
-def save_to_pickle(response):
-    return pickle.loads(response.content)
-
-def single_picture_loader(img_path):
-  BATCH_SIZE = 1
-  UNUSED_LABEL = [1]
-  IMAGES = [img_path]
-  return My_Custom_Generator(IMAGES, UNUSED_LABEL,BATCH_SIZE)
 
 
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
-file_id = '12FFDJrXrrvpxArx1qE1fwdomOZ9Zd5ef'
-destination_w = 'model_weights.pkl'
-loaded_weights = download_file_from_google_drive(file_id, destination_w)
 
-model_function = '1-8CBiDAPE4pdPJtvRLi77PtrC4zNthJa'
-destination_f = 'model_function.pkl'
-model_function = download_file_from_google_drive(model_function, destination_f)
+model = generate_model()
+model.load_weights('./15209814/modelo1_weights.h5')
 
-model = model_function()
-model.set_weights(loaded_weights)
+
+
 # model = load_model(destination)
 @app.route('/')
 def home():
@@ -115,13 +92,28 @@ def predict():
         data = [message]
         generator = single_picture_loader(data)
         print(model.summary())
-        # my_prediction = model.predict(generator)
-        # if my_prediction == 1:
-        #     output = "a Spam"
-        # elif my_prediction == 0:
-        #     output = "Not a Spam"
+        image = decode()
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (224, 224))
+        image = [image]
+        image = np.array(image)/255.0
+        image = [image for _ in range(3)]
+        pred = model.predict(image, batch_size=1)
+        pred = np.argmax(pred, axis = 1)
+        # #como yo lo plantee
+        # # 0 neumonía
+        # # 1 covid
+        # # 2 sano
+        # resultado = 0
+        if pred[0] == 0:
+            resultado = 1
+        if pred[0] == 1:
+            resultado = 2
+        if pred[0] == 2:
+            resultado = 0
+        print(resultado,"CLASSIFICATION")
+        
     
-    outputs = 'This email is '+output
     return render_template('index2.html', generator_data=generator , value=message)
 if __name__ == "__main__":
     
