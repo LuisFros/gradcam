@@ -1,11 +1,10 @@
 #importing libraries
-import numpy as np
 from flask import Flask, request, jsonify, render_template
 from flask_ngrok import run_with_ngrok
 import pickle
 from skimage.io import imread
 from skimage.transform import resize
-from numpy import load,array,argmax
+from numpy import array,argmax,uint8
 from tensorflow.keras.models import model_from_json
 import urllib.request
 import os
@@ -32,11 +31,6 @@ app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
 
-with open("model_num.json", "r") as json_file:
-    model = model_from_json(json_file.read())
-
-model.load_weights('modelo1_weights.h5')
-
 
 # model = load_model(destination)
 @app.route('/')
@@ -52,13 +46,17 @@ def predict():
         message = request.form['message']
         data = message
         # generator = single_picture_loader(data)
+        with open("model_num.json", "r") as json_file:
+            model = model_from_json(json_file.read())
+
+        model.load_weights('modelo1_weights.h5')
         image = decode(data)
         image = resize(image, (224, 224,3))
         image = [image]
-        image = np.array(image)/255.0
+        image = array(image,dtype=uint8)/255.0
         image = [image for _ in range(3)]
         pred = model.predict(image, batch_size=1)
-        pred = np.argmax(pred, axis = 1)
+        pred = argmax(pred, axis = 1)
         # #como yo lo plantee
         # # 0 neumonía
         # # 1 covid
