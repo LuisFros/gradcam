@@ -1,1 +1,1 @@
-web: gunicorn app:app --timeout 200 --workers 3
+web: sh setup.sh && streamlit run rps_app.py
