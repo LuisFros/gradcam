@@ -1,2 +1,2 @@
-*.h5
-*.json
+.DS_Store
+*.mypy_cache
