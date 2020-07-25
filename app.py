@@ -89,7 +89,6 @@ def predict():
         message = request.form['message']
         data = [message]
         # generator = single_picture_loader(data)
-        print(model.summary())
         image = decode(data)
         image = resize(image, (224, 224,3))
         image = [image]
