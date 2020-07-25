@@ -6,7 +6,7 @@ import pickle
 from skimage.io import imread
 from skimage.transform import resize
 from numpy import load,array,argmax
-import tensorflow
+from tensorflow.keras.models import model_from_json
 import urllib.request
 import os
 import requests
@@ -31,11 +31,9 @@ def decode(base64_string):
 app = Flask(__name__)
 run_with_ngrok(app)#loading the model weights
 
-with open('model.pkl','rb') as file:
-  model_from_json_pickle = pickle.load(file)
 
 with open("model_num.json", "r") as json_file:
-    model = model_from_json_pickle(json_file.read())
+    model = model_from_json(json_file.read())
 
 model.load_weights('modelo1_weights.h5')
 
