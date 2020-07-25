@@ -87,7 +87,7 @@ def predict():
     '''
     if request.method == 'POST':
         message = request.form['message']
-        data = [message]
+        data = message
         # generator = single_picture_loader(data)
         image = decode(data)
         image = resize(image, (224, 224,3))
