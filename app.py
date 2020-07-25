@@ -90,9 +90,9 @@ def predict():
     if request.method == 'POST':
         message = request.form['message']
         data = [message]
-        generator = single_picture_loader(data)
+        # generator = single_picture_loader(data)
         print(model.summary())
-        image = decode()
+        image = decode(data)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = cv2.resize(image, (224, 224))
         image = [image]
