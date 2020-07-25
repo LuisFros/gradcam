@@ -18,10 +18,10 @@ def decode(base64_string):
 @router.post('/classify_iris')
 def extract_name(file_data: str = Body(...)):
 
-    with open("/data/model_num.json", "r") as json_file:
+    with open("../../data/model_num.json", "r") as json_file:
         model = model_from_json(json_file.read())
     
-    model.load_weights('/data/modelo1_weights.h5')
+    model.load_weights('../../data/modelo1_weights.h5')
     image = decode(file_data)
     image = resize(image, (224, 224,3))
     image = [image]
