@@ -60,7 +60,6 @@ def generate_model():
 def decode(base64_string):
     if isinstance(base64_string, bytes):
         base64_string = base64_string.decode("utf-8")
-
     imgdata = base64.b64decode(base64_string)
     img = imread(imgdata, plugin='imageio')
     return img
