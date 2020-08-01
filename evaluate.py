@@ -1,15 +1,4 @@
 from tensorflow.keras.models import load_model
-from tensorflow.keras.utils import get_file
-from tensorflow.keras.utils import Sequence
-# import the necessary packages
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.preprocessing.image import img_to_array
-from tensorflow.keras.applications.vgg19 import preprocess_input
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import load_model
-from numpy import load,array,argmax
-import urllib.request
-import sys 
 
 ## Import custom functions and configuration
 from loader import get_from_pickle, ConfigLoader
