@@ -7,8 +7,11 @@ The purpose of this tool is to provide an OpenSource option to evaluate Tensorfl
     - docker-compose installed (see [docker-compose](https://docs.docker.com/compose/install/))
 - Features: 
     - Custom packages can be installed in python image.
-    - Download weights or model from Google Drive. 
-    - Evaluate your model locally.
+    - Download weights and/or model from Google Drive.
+    - Load model from pickle, native keras formats or tensorflow.
+    - Evaluate your model.
 
 ## Getting Started
 
+## References:
+ -  https://stackoverflow.com/a/39225039
