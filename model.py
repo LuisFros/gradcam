@@ -1,4 +1,6 @@
 
+#### Model code and custom functions go here #### 
+
 from tensorflow.keras.layers import Dense, Conv2D, MaxPooling2D,AveragePooling2D,Input, Dropout, Flatten, BatchNormalization
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model

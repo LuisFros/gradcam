@@ -15,15 +15,10 @@ import sys
 from model import compile_get_model,single_picture_loader,generate_grad_cam
 from loader import get_from_pickle, ConfigLoader
 
-EVALUATE_CONFIG = 'config.json'
-
-arguments = sys.argv 
-config = ConfigLoader(EVALUATE_CONFIG)
-
-if len(arguments)!=2:
-  print('Command must be like:"python evaluate.py path_to_image.png"')
-else:
-  img_path = arguments[-1]
+def main():
+  EVALUATE_CONFIG = 'config.json'
+  config = ConfigLoader(EVALUATE_CONFIG)
+  img_path = 'COVID.png'
 
   ## Check that drive or local are not empty.
   assert(config.drive or config.local==True)
