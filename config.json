@@ -1,15 +1,15 @@
 {
-    "drive":{
-        "weights_only":true,
-        "weights_id":"1-CAK0sRHULQHPpon99goGViH71fs7D-h",
-        "weights_destination":"model_weights.pkl",
-        "model_id":"",
-        "model_destination":""
+    "drive":[
+            { "file_id":"FILE_ID_HERE", "destination":"model_weights.pkl"}
+          ],
+    "model":{
+        "required":false,
+        "location":"model.h5",
+        "pickle":false
     },
-    "local":{
-        "weights_only":true,
-        "weights_location":"",
-        "model_location":""
-    }
-
+    "weights":{
+        "required":true,
+        "location":"model_weights.pkl",
+        "pickle":true
+    }     
 }

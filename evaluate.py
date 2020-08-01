@@ -11,46 +11,37 @@ from numpy import load,array,argmax
 import urllib.request
 import sys 
 
-
-from model import compile_get_model,single_picture_loader,generate_grad_cam
+## Import custom functions and configuration
 from loader import get_from_pickle, ConfigLoader
+
+## Here import your model and functions for pre-processing
+from model import compile_get_model
+
 
 def main():
   EVALUATE_CONFIG = 'config.json'
   config = ConfigLoader(EVALUATE_CONFIG)
-  img_path = 'COVID.png'
+  
+  config.download_all_files()
 
-  ## Check that drive or local are not empty.
-  assert(config.drive or config.local==True)
+  model =  config.model
+  weights =  config.weights
 
-  if config.drive:
-    print("Loading data from drive")
-    drive =  config.drive 
-    weights_id = drive.weights_id
-    weights_destination = drive.weights_destination
-    weights = get_from_pickle(weights_id, weights_destination)
-    if drive.weights_only:
-
-      ## get model from function
-      model = compile_get_model()
+  if model.required:
+    if model.pickle:
+      model = get_from_pickle(model.location)
     else:
-      ## get model from pickle
-      model_id = drive.model_id
-      model_destination = drive.model_destination
-      model = get_from_pickle(model_id, model_destination)
-      
-    model.set_weights(weights)
+      model = load_model(model.location)
   else:
-    local = config.local
-    if local.weights_only:
-      model = compile_get_model()
-      model.load_weights(local.weights_location)
-    else:
-      load_model(local.model_location)
-  
-  ### Here goes the evaluation code for your own model
-  
-  pred = model.predict(single_picture_loader(img_path))
-  print(argmax(pred,axis=1)[0])
+    model = compile_get_model()  
 
-  generate_grad_cam(img_path,model,"gradcam.jpg")
+  ## required when model is not loaded with "load_model"
+  if weights.required:
+    if weights.pickle:
+      weights = get_from_pickle(weights.location)
+      model.set_weights(weights)
+    else:
+      model.load_weights(weights.location)
+  
+  ### Here goes the evaluation code for your own model (use model to predict)
+  ## Ex: model.predict(...)
