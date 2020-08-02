@@ -18,6 +18,7 @@ The purpose of this tool is to provide an OpenSource option to evaluate Tensorfl
 3. Add your model code to `model.py` and import it in `evaluate.py`.
 4. Upload weights or model to Googe Drive storage or locally if you prefer. (`.pkl`, `.h5` or `SavedModel` supported)
 5. Update `config.json` according to your files.
+6. Run evaluation with `docker-compose up web`
 
 ### Example `config.json` 
 -----
